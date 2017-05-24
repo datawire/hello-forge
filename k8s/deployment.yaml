@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{name}}
+  name: {{service.name}}
 spec:
   selector:
-    app: {{name}}
+    app: {{service.name}}
   ports:
     - protocol: TCP
       port: 80
@@ -14,28 +14,28 @@ spec:
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
-metadata: {name: {{name}}}
+metadata: {name: {{service.name}}}
 spec:
   replicas: 1
   selector:
-    matchLabels: {app: {{name}}}
+    matchLabels: {app: {{service.name}}}
   strategy:
     rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
     type: RollingUpdate
   revisionHistoryLimit: 1
   template:
     metadata:
-      labels: {app: {{name}}}
-      name: {{name}}
+      labels: {app: {{service.name}}}
+      name: {{service.name}}
     spec:
       containers:
-      - image: {{images["Dockerfile"]}}
+      - image: {{build.images["Dockerfile"]}}
         imagePullPolicy: IfNotPresent
-        name: {{name}}
+        name: {{service.name}}
         resources:
           limits:
-            memory: {{memory}}
-            cpu: {{cpu}}
+            memory: {{service.memory}}
+            cpu: {{service.cpu}}
         terminationMessagePath: /dev/termination-log
       dnsPolicy: ClusterFirst
       restartPolicy: Always
