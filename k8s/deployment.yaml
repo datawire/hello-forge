@@ -7,9 +7,9 @@ spec:
   selector:
     app: {{service.name}}
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
+    - protocol: {{service.protocol or 'TCP'}}
+      port: {{service.port or '80'}}
+      targetPort: {{service.targetPort or '8080'}}
   type: LoadBalancer
 ---
 apiVersion: extensions/v1beta1
