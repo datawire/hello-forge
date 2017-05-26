@@ -1,37 +1,62 @@
+{#
+
+This template encodes the canary deployment practices described here:
+
+  https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/#canary-deployments
+
+Each 'track' is a parallel deployment of the application. Each track
+has it's own service named {{service.name}}-{{service.track}} that
+routes directly to the specific track deployment, and {{service.name}}
+is set up to route to all deployments regardless of track.
+
+#}
+
+{% set track = service.track or 'stable' %}
+{% set canary = track != 'stable' %}
+{% set name = '%s-%s' % (service.name, service.track) if canary else service.name %}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{service.name}}
+  name: {{name}}
 spec:
   selector:
     app: {{service.name}}
+{% if canary %}
+    track: {{track}}
+{% endif %}
   ports:
     - protocol: {{service.protocol or 'TCP'}}
       port: {{service.port or '80'}}
       targetPort: {{service.targetPort or '8080'}}
   type: LoadBalancer
+
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
-metadata: {name: {{service.name}}}
+metadata: {name: {{name}}}
 spec:
   replicas: 1
   selector:
-    matchLabels: {app: {{service.name}}}
+    matchLabels:
+      app: {{service.name}}
+      track: {{track}}
   strategy:
     rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
     type: RollingUpdate
   revisionHistoryLimit: 1
   template:
     metadata:
-      labels: {app: {{service.name}}}
-      name: {{service.name}}
+      labels:
+        app: {{service.name}}
+        track: {{track}}
+      name: {{name}}
     spec:
       containers:
       - image: {{build.images["Dockerfile"]}}
         imagePullPolicy: IfNotPresent
-        name: {{service.name}}
+        name: {{name}}
         resources:
           limits:
             memory: {{service.memory}}

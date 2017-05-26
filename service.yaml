@@ -1,4 +1,14 @@
 name: hello-forge  # name of the service
+
+# The service 'track' can be used to easily implement the pattern described here:
+#
+#   https://kubernetes.io/docs/concepts/cluster-administration/manage-deployment/#canary-deployments
+#
+# The default track is named 'stable'. Each track is concurrently
+# deployed in order ot enable multiple long lived canaries:
+#
+# track: my-canary
+
 targetPort: 8080   # port the container exposes
 
 memory: 0.25G      # minimum available memory necessary to schedule the service
