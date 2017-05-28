@@ -26,7 +26,7 @@ Forge looks at these files to build and deploy the edge service:
    This tells forge how to build the service. You can replace this
    with a different Dockerfile if you want to use a different
    application framework, or replace this edge service with a
-   prepackaged API gateway like [ambassador](getambassador.io).
+   prepackaged API gateway like [ambassador](http://getambassador.io).
 
  - k8s/*
 
